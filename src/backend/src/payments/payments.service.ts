@@ -1,54 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { PaymentRepository } from './repositories/payment.repository';
-import { UserRepository } from './repositories/user.repository';
-import { DebtRepository } from './repositories/debt.repository';
-import { PaymentDto } from './dto/payment.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Payment } from '../entities/payment.entity';
+import { CreatePaymentDto } from './dto/create-payment.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @Injectable()
 export class PaymentsService {
   constructor(
-    private readonly paymentRepository: PaymentRepository,
-    private readonly userRepository: UserRepository,
-    private readonly debtRepository: DebtRepository,
+    @InjectRepository(Payment)
+    private readonly paymentsRepository: Repository<Payment>,
   ) {}
 
-  async addPayment(userId: string, paymentDto: PaymentDto): Promise<void> {
-    const user = await this.userRepository.findById(userId);
-    
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const canPay = await this.validateFinancialStatus(userId, paymentDto.amount);
-    
-    if (!canPay) {
-      throw new Error('Insufficient funds or debts');
-    }
-
-    await this.paymentRepository.create({ userId, ...paymentDto });
-    await this.debtRepository.adjustDebt(userId, -paymentDto.amount);
+  create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    const payment = this.paymentsRepository.create(createPaymentDto);
+    return this.paymentsRepository.save(payment);
   }
 
-  async getPaymentHistory(userId: string): Promise<any[]> {
-    const payments = await this.paymentRepository.findByUserId(userId);
-    return payments;
+  findAll(): Promise<Payment[]> {
+    return this.paymentsRepository.find();
   }
 
-  async handleProof(userId: string, paymentId: string, proof: any): Promise<void> {
-    const payment = await this.paymentRepository.findById(paymentId);
-    
-    if (!payment || payment.userId !== userId) {
-      throw new Error('Payment or user not found');
+  async findOne(id: number): Promise<Payment> {
+    const payment = await this.paymentsRepository.findOne({ where: { id } });
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
     }
-
-    payment.proof = proof;
-    await this.paymentRepository.update(paymentId, payment);
+    return payment;
   }
 
-  async validateFinancialStatus(userId: string, amount: number): Promise<boolean> {
-    const totalDebt = await this.debtRepository.getTotalDebt(userId);
-    const userFunds = await this.userRepository.getFunds(userId);
+  async update(id: number, updatePaymentDto: UpdatePaymentDto): Promise<Payment> {
+    const payment = await this.findOne(id);
+    Object.assign(payment, updatePaymentDto);
+    return this.paymentsRepository.save(payment);
+  }
 
-    return userFunds >= amount && totalDebt <= userFunds;
+  async remove(id: number): Promise<void> {
+    const result = await this.paymentsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('Payment not found');
+    }
   }
 }

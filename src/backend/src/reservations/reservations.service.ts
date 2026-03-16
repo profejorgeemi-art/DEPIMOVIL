@@ -1,50 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { Reservation } from './reservation.entity'; // Assuming we have a Reservation entity
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Reservation } from '../entities/reservation.entity';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
-import { NotificationService } from '../notification/notification.service'; // Notification service for sending automatic notifications
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class ReservationsService {
-    constructor(private readonly notificationService: NotificationService) {}
+  constructor(
+    @InjectRepository(Reservation)
+    private readonly reservationsRepository: Repository<Reservation>,
+    private readonly notificationService: NotificationService,
+  ) {}
 
-    async createReservation(createReservationDto: CreateReservationDto): Promise<Reservation> {
-        // Perform validation and business rules here
-        this.validateReservation(createReservationDto);
-        const reservation = new Reservation(createReservationDto);
-        
-        // Save reservation logic (assuming an ORM is used)
-        await reservation.save();
+  async create(createReservationDto: CreateReservationDto): Promise<Reservation> {
+    const reservation = this.reservationsRepository.create(createReservationDto);
+    const saved = await this.reservationsRepository.save(reservation);
+    this.notificationService.sendReservationConfirmation(saved);
+    return saved;
+  }
 
-        // Send automatic notification
-        this.notificationService.sendReservationConfirmation(reservation);
+  findAll(): Promise<Reservation[]> {
+    return this.reservationsRepository.find();
+  }
 
-        return reservation;
+  async findOne(id: string): Promise<Reservation> {
+    const reservation = await this.reservationsRepository.findOne({ where: { id: +id } });
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
     }
+    return reservation;
+  }
 
-    async updateReservation(id: number, updateReservationDto: UpdateReservationDto): Promise<Reservation> {
-        const reservation = await this.findReservationById(id);
-        if (!reservation) {
-            throw new Error('Reservation not found');
-        }
-        
-        // Update logic including validations and rules
-        Object.assign(reservation, updateReservationDto);
-        await reservation.save();
-        
-        // Optionally send update notifications
-        this.notificationService.sendUpdateNotification(reservation);
-        return reservation;
+  async update(id: string, updateReservationDto: UpdateReservationDto): Promise<Reservation> {
+    const reservation = await this.findOne(id);
+    Object.assign(reservation, updateReservationDto);
+    const saved = await this.reservationsRepository.save(reservation);
+    this.notificationService.sendUpdateNotification(saved);
+    return saved;
+  }
+
+  async remove(id: string): Promise<void> {
+    const result = await this.reservationsRepository.delete(+id);
+    if (result.affected === 0) {
+      throw new NotFoundException('Reservation not found');
     }
-
-    async findReservationById(id: number): Promise<Reservation | null> {
-        // Logic for finding and returning a reservation by ID
-    }
-
-    private validateReservation(createReservationDto: CreateReservationDto): void {
-        // Implement various validation checks
-        // e.g., check if the reservation time is available, user is eligible, etc.
-    }
-
-    // Additional methods for managing reservation status, blocking rules, etc.
+  }
 }
