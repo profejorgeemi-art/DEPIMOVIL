@@ -1,34 +1,45 @@
-import { Injectable } from 'nestjs';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
+import { UsersService } from '../users/users.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-    private readonly saltRounds = 10;
-    private readonly jwtSecret = 'your_jwt_secret'; // Use a secure and secret value in production
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    public async register(username: string, password: string): Promise<void> {
-        const hashedPassword = await bcrypt.hash(password, this.saltRounds);
-        // Here, save the user (username and hashedPassword) to your database
-        console.log(`Registering user: ${username} with password: ${hashedPassword}`);
+  async register(registerDto: RegisterDto): Promise<{ message: string }> {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    await this.usersService.create({
+      ...registerDto,
+      password: hashedPassword,
+    });
+    return { message: 'User registered successfully' };
+  }
+
+  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
+    const user = await this.usersService.findByEmail(loginDto.email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-
-    public async login(username: string, password: string): Promise<string> {
-        // Retrieve the user from your database by username
-        // Assuming you have a function `findUserByUsername`
-        const user = await this.findUserByUsername(username);
-        if (!user) throw new Error('User not found');
-
-        const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
-        if (!isPasswordValid) throw new Error('Invalid password');
-
-        // Generate JWT Token
-        const token = jwt.sign({ username }, this.jwtSecret, { expiresIn: '1h' });
-        return token;
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
     }
+    const payload = { sub: user.id, email: user.email };
+    return { access_token: this.jwtService.sign(payload) };
+  }
 
-    private async findUserByUsername(username: string): Promise<any> {
-        // Implement your user database retrieval logic here
-        return null; // Placeholder
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmail(email);
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const { password: _pw, ...result } = user;
+      return result;
     }
+    return null;
+  }
 }

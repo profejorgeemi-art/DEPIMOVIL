@@ -1,52 +1,47 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { Operator } from './operator.entity';  // Assuming an Operator entity exists
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Operator } from '../entities/operator.entity';
+import { CreateOperatorDto } from './dto/create-operator.dto';
+import { UpdateOperatorDto } from './dto/update-operator.dto';
 
 @Injectable()
-export class OperatorService {
-    constructor(
-        @InjectRepository(Operator)
-        private operatorsRepository: Repository<Operator>,
-    ) {}
+export class OperatorsService {
+  constructor(
+    @InjectRepository(Operator)
+    private readonly operatorsRepository: Repository<Operator>,
+  ) {}
 
-    // Method to create a new operator
-    async createOperator(data: CreateOperatorDto): Promise<Operator> {
-        try {
-            // Validate input data
-            if (!data.name || !data.email) {
-                throw new BadRequestException('Name and email are required');
-            }
-
-            const newOperator = this.operatorsRepository.create(data);
-            return await this.operatorsRepository.save(newOperator);
-        } catch (error) {
-            throw new BadRequestException('Error creating operator: ' + error.message);
-        }
+  async createOperator(data: CreateOperatorDto): Promise<Operator> {
+    if (!data.name || !data.email) {
+      throw new BadRequestException('Name and email are required');
     }
+    const newOperator = this.operatorsRepository.create(data);
+    return this.operatorsRepository.save(newOperator);
+  }
 
-    // Method to retrieve an operator by ID
-    async getOperator(id: number): Promise<Operator> {
-        const operator = await this.operatorsRepository.findOne(id);
-        if (!operator) {
-            throw new NotFoundException('Operator not found');
-        }
-        return operator;
-    }
+  async findAll(): Promise<Operator[]> {
+    return this.operatorsRepository.find();
+  }
 
-    // Method to update an existing operator
-    async updateOperator(id: number, updateData: UpdateOperatorDto): Promise<Operator> {
-        let operator = await this.getOperator(id);
-        // Update operator properties
-        Object.assign(operator, updateData);
-        return await this.operatorsRepository.save(operator);
+  async getOperator(id: number): Promise<Operator> {
+    const operator = await this.operatorsRepository.findOne({ where: { id } });
+    if (!operator) {
+      throw new NotFoundException('Operator not found');
     }
+    return operator;
+  }
 
-    // Method to delete an operator
-    async deleteOperator(id: number): Promise<void> {
-        const result = await this.operatorsRepository.delete(id);
-        if (result.affected === 0) {
-            throw new NotFoundException('Operator not found');
-        }
+  async updateOperator(id: number, updateData: UpdateOperatorDto): Promise<Operator> {
+    const operator = await this.getOperator(id);
+    Object.assign(operator, updateData);
+    return this.operatorsRepository.save(operator);
+  }
+
+  async deleteOperator(id: number): Promise<void> {
+    const result = await this.operatorsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('Operator not found');
     }
+  }
 }
