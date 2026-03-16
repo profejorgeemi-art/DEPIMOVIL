@@ -1,0 +1,5 @@
+export class CreateOperatorDto {
+    name: string;
+    email: string;
+    phone: string;
+}
