@@ -1,5 +1,9 @@
 -- PostgreSQL Schema for DepiMovil
 
+-- Enum types
+CREATE TYPE uso_operativo AS ENUM ('viajera', 'base_ciudad', 'solo_venta');
+CREATE TYPE estado_maquina AS ENUM ('disponible', 'reservada', 'mantenimiento', 'fuera_servicio', 'en_viaje');
+
 -- Table for Users
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
@@ -21,19 +25,38 @@ CREATE TABLE operators (
 
 -- Table for Machines
 CREATE TABLE machines (
-    machine_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    type VARCHAR(50),
-    location TEXT,
+    id SERIAL PRIMARY KEY,
+    codigo_interno VARCHAR(20) NOT NULL UNIQUE,
+    nombre_comercial VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    uso_operativo uso_operativo DEFAULT 'base_ciudad',
+    ciudad_base VARCHAR(50),
+    ubicacion_actual VARCHAR(100),
+    estado estado_maquina DEFAULT 'disponible',
+    marca VARCHAR(100),
+    modelo_tipo VARCHAR(100),
+    pais_base VARCHAR(50) DEFAULT 'Uruguay',
+    descripcion TEXT,
+    serial_number VARCHAR(50),
+    icono_url TEXT,
+    foto_url TEXT,
+    observaciones_tecnicas TEXT,
+    ultimo_mantenimiento DATE,
+    proximo_mantenimiento DATE,
+    ciudades_restringidas TEXT[] DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Index for filtering machines by city and status
+CREATE INDEX idx_machines_ciudad_estado ON machines(ciudad_base, estado);
+CREATE INDEX idx_machines_uso_operativo ON machines(uso_operativo);
 
 -- Table for Reservations
 CREATE TABLE reservations (
     reservation_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id),
-    machine_id INT REFERENCES machines(machine_id),
+    machine_id INT REFERENCES machines(id),
     start_time TIMESTAMPTZ,
     end_time TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -54,7 +77,7 @@ CREATE TABLE payments (
 -- Table for Logistics
 CREATE TABLE logistics (
     logistic_id SERIAL PRIMARY KEY,
-    machine_id INT REFERENCES machines(machine_id),
+    machine_id INT REFERENCES machines(id),
     operator_id INT REFERENCES operators(operator_id),
     scheduled_time TIMESTAMPTZ,
     status VARCHAR(50),
@@ -74,7 +97,7 @@ CREATE TABLE notifications (
 -- Table for Incidents
 CREATE TABLE incidents (
     incident_id SERIAL PRIMARY KEY,
-    machine_id INT REFERENCES machines(machine_id),
+    machine_id INT REFERENCES machines(id),
     description TEXT,
     reported_at TIMESTAMPTZ DEFAULT NOW(),
     resolved BOOLEAN DEFAULT FALSE
@@ -103,3 +126,16 @@ CREATE TABLE audit_logs (
     user_id INT REFERENCES users(user_id),
     timestamp TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration: Add new columns to existing machines table
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS uso_operativo uso_operativo DEFAULT 'base_ciudad';
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS ciudades_restringidas TEXT[] DEFAULT '{}';
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS codigo_interno VARCHAR(20);
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS nombre_comercial VARCHAR(100);
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS ciudad_base VARCHAR(50);
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS ubicacion_actual VARCHAR(100);
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS icono_url TEXT;
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS foto_url TEXT;
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS observaciones_tecnicas TEXT;
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS ultimo_mantenimiento DATE;
+-- ALTER TABLE machines ADD COLUMN IF NOT EXISTS proximo_mantenimiento DATE;
