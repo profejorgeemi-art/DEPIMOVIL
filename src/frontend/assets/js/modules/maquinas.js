@@ -664,6 +664,9 @@ async function convertirViajeraABase(id){
   const m=(DB.get('maquinas')||[]).find(x=>x.id===id);if(!m)return;
   try{
     await api('/api/maquinas/'+id,{method:'PUT',body:JSON.stringify({
+      codigo:m.codigo,
+      nombre:m.nombre,
+      categoria:m.categoria||m.category||'',
       tipo_operativo:'base_ciudad',
       ciudad_base:ciudad,
       ubicacion:ciudad,
@@ -681,6 +684,9 @@ async function convertirBaseAViajera(id){
   if(!confirm(`¿Convertir ${m.codigo} a viajera? Dejará de estar fija en ${m.ciudadBase||'su ciudad'}.`))return;
   try{
     await api('/api/maquinas/'+id,{method:'PUT',body:JSON.stringify({
+      codigo:m.codigo,
+      nombre:m.nombre,
+      categoria:m.categoria||m.category||'',
       tipo_operativo:'viajera',
       ciudad_base:null,
       es_viajera:true
