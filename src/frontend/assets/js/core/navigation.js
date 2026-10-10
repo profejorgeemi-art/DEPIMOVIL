@@ -1,0 +1,102 @@
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+const viewTitles={'transportistas':'Transportistas',
+  dashboard:'Menú',operadoras:'Operadoras','operadora-ficha':'Ficha de Operadora',
+  'revision-operadoras':'Revisión de Operadoras',
+  documentos:'Documentos de Operadoras',
+  maquinas:'Máquinas','maquina-ficha':'Ficha de Máquina',
+  mantenimientos:'Mantenimientos de Máquinas',
+  limpiezas:'Limpiezas de Máquinas',
+  usuarios:'Usuarios internos',
+  reservas:'Reservas','reserva-ficha':'Ficha de Reserva',
+  calendario:'Calendario de Reservas',
+  logistica:'Reglas Logísticas',
+  pagos:'Pagos y Señas','pago-ficha':'Detalle de Pago',
+  caja:'Caja',
+  proveedores:'Proveedores',
+  compras:'Compras',
+  'ventas-maquinas':'Ventas de Máquinas',
+  contratos:'Contratos de Alquiler',
+  whatsapp:'Centro de Notificaciones WhatsApp',
+  envios:'Envíos de Máquinas','envio-ficha':'Ficha de Envío',
+  configuracion:'Colores',
+  reportes:'Reportes Operativos',
+  auditoria:'Log de Auditoría',
+  leads:'Leads / Prospectos CRM','lead-ficha':'Ficha de Lead',
+  embudo:'Embudo Comercial',
+  materiales:'Certificaciones',
+};
+const navGroupByView={
+  'revision-operadoras':'operaciones',documentos:'operaciones',mantenimientos:'operaciones',calendario:'operaciones',materiales:'operaciones',
+  pagos:'finanzas',proveedores:'finanzas',compras:'finanzas','ventas-maquinas':'finanzas',contratos:'finanzas',
+  envios:'logistica',transportistas:'logistica',limpiezas:'logistica',logistica:'logistica',
+  leads:'comercial',embudo:'comercial',
+  reportes:'sistema',auditoria:'sistema',configuracion:'sistema',usuarios:'sistema'
+};
+function navigate(view){
+  if(typeof canView==='function'&&!canView(view)){
+    const fallback=(typeof getAccessRole==='function'&&getAccessRole()==='transportista')?'envios':'dashboard';
+    showToast('⚠️ Tu usuario no tiene acceso a ese módulo','warn');
+    if(view!==fallback)return navigate(fallback);
+    return;
+  }
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('view-'+view);
+  if(el)el.classList.add('active');
+  const nav=document.querySelector('[data-view="'+view+'"]');
+  if(nav)nav.classList.add('active');
+  const group=navGroupByView[view];
+  if(group){
+    const details=document.querySelector('[data-nav-group="'+group+'"]');
+    if(details)details.open=true;
+  }
+  document.getElementById('pageTitle').textContent=viewTitles[view]||view;
+  const dashBtn=document.getElementById('dashboardHomeBtn');
+  if(dashBtn)dashBtn.style.display=view==='dashboard'?'none':'inline-flex';
+  // Sync bottom nav active state
+  document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.remove('active'));
+  const bnavBtn=document.querySelector('[data-bnav="'+view+'"]');
+  if(bnavBtn)bnavBtn.classList.add('active');
+  // Scroll to top on view change
+  window.scrollTo({top:0,behavior:'smooth'});
+  closeSidebar();
+  if(view==='dashboard')renderDashboard();
+  if(view==='operadoras')renderOperadoras();
+  if(view==='revision-operadoras')renderRevisionOperadoras();
+  if(view==='documentos')renderDocumentos();
+  if(view==='maquinas')renderMaquinas();
+  if(view==='mantenimientos')renderMantenimientos();
+  if(view==='limpiezas')renderLimpiezas();
+  if(view==='usuarios')renderUsuarios();
+  if(view==='reservas'){
+    renderReservas();
+    if(currentUser&&currentUser.rol==='coordinadora')cargarControlReservas().then(()=>{if(document.getElementById('view-reservas')?.classList.contains('active'))renderReservas();});
+  }
+  if(view==='calendario')renderCalendario();
+  if(view==='logistica')renderLogistica();
+  if(view==='pagos')renderPagos();
+  if(view==='caja')renderCaja();
+  if(view==='proveedores')renderProveedores();
+  if(view==='compras')renderCompras();
+  if(view==='ventas-maquinas')renderVentasMaquinas();
+  if(view==='contratos')renderContratos();
+  if(view==='transportistas')initTransportistas();
+  if(view==='whatsapp'){renderWA('pendientes');updateWABadge();}
+  if(view==='envios')renderEnvios();
+  if(view==='configuracion')renderConfiguracion();
+  if(view==='reportes')renderReportes();
+  if(view==='auditoria')renderAuditoria();
+  if(view==='leads')renderLeads();
+  if(view==='embudo')renderEmbudo();
+  if(view==='materiales')renderMateriales();
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}

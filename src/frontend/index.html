@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plataforma Operativa DepiMóvil</title>
+<meta name="description" content="Alta online de operadoras DepiMóvil. Completá tus datos para ingresar al sistema y comenzar el proceso de habilitación."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="DepiMóvil CRM"/>
+<meta property="og:title" content="DepiMóvil - Reservá tu equipo"/>
+<meta property="og:description" content="Agendá tu máquina y asegurate las mejores fechas disponibles, todo desde el celular."/>
+<meta property="og:url" content="https://crm.depimovil.live/"/>
+<meta property="og:image" content="https://crm.depimovil.live/assets/img/depimovil-crm-share.jpg?v=20260828"/>
+<meta property="og:image:secure_url" content="https://crm.depimovil.live/assets/img/depimovil-crm-share.jpg?v=20260828"/>
+<meta property="og:image:type" content="image/jpeg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="DepiMóvil - Reservá tu equipo con anticipación"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="DepiMóvil - Reservá tu equipo"/>
+<meta name="twitter:description" content="Agendá tu máquina y asegurate las mejores fechas disponibles."/>
+<meta name="twitter:image" content="https://crm.depimovil.live/assets/img/depimovil-crm-share.jpg?v=20260828"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+
+<link rel="manifest" href="/manifest.json?v=20260922"/>
+<meta name="theme-color" content="#1b2236"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png?v=20260922"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16.png?v=20260922"/>
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png?v=20260922"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DepiMóvil"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="stylesheet" href="assets/css/app.css?v=20261010-bottomnav2"/>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-mark"><img src="/logo.png?v=20260807" alt="DepiMóvil" style="width:64px;height:64px;border-radius:16px;object-fit:cover;display:block;" onerror="this.style.display='none';this.parentNode.innerHTML='✦'"/></div>
+      <h1>DepiMóvil</h1>
+      <p>Plataforma Operativa</p>
+    </div>
+    <div class="login-tabs" id="loginTabs" style="display:none">
+      <button class="login-tab" id="tabLoginAdmin" onclick="switchLoginMode('admin')">Acceso interno</button>
+      <button class="login-tab active" id="tabLoginWhatsapp" onclick="switchLoginMode('whatsapp')">WhatsApp</button>
+    </div>
+    <div id="loginAdminPanel" style="display:none">
+      <div class="field-group"><label>Email</label>
+        <input type="email" id="loginEmail" placeholder="usuario@depimovil.com" autocomplete="username"/></div>
+      <div class="field-group"><label>Contraseña</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/></div>
+      <button class="btn-primary" onclick="doLogin()">Ingresar al Sistema</button>
+    </div>
+    <div id="loginWhatsappPanel">
+      <input type="hidden" id="waLoginRol" value="admin"/>
+      <div class="login-demo" style="margin-top:0;margin-bottom:18px">
+        <p>Acceso de operadoras</p>
+        <div class="demo-row"><span>Si ya estás dada de alta, pedí el código con tu WhatsApp. Si nunca te registraste, usá el botón de nueva operadora.</span></div>
+      </div>
+      <div class="field-group"><label>WhatsApp</label>
+        <input type="tel" id="waLoginPhone" placeholder="+598 99 123 456"/></div>
+      <div id="waCodeGroup" class="field-group" style="display:none"><label>Código</label>
+        <input type="text" id="waLoginCode" placeholder="123456" maxlength="6" inputmode="numeric"/></div>
+      <button class="btn-primary" id="waRequestBtn" onclick="requestWhatsappCode()">Enviar código por WhatsApp</button>
+      <button class="btn-primary" id="waVerifyBtn" onclick="verifyWhatsappCode()" style="display:none;margin-top:10px">Ingresar con código</button>
+      <button class="btn-secondary full-width" onclick="openOperadoraRegistro()" style="margin-top:10px">Registrarme como nueva operadora</button>
+    </div>
+    <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
+  </div>
+</div>
+
+<!-- REGISTRO NUEVA OPERADORA — FORMULARIO SIMPLIFICADO -->
+<div class="modal-overlay" id="modalRegistroOperadora">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:28px">👋</span>
+        <div>
+          <h3 style="margin:0;font-size:17px">¡Bienvenida a DepiMóvil!</h3>
+          <p style="margin:0;font-size:12px;color:var(--text2)">Necesitamos estos datos para empezar</p>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalRegistroOperadora')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px">
+      <div style="background:rgba(212,169,106,0.08);border:1px solid rgba(212,169,106,0.2);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text2);line-height:1.5">
+        📱 Te avisamos por WhatsApp cuando tu cuenta quede habilitada. ¡Es rápido!
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-field" style="margin:0">
+          <label style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block">Nombre <span style="color:var(--accent)">*</span></label>
+          <input type="text" id="regOpNombre" placeholder="Tu nombre" autocomplete="off" style="width:100%;box-sizing:border-box"/>
+        </div>
+        <div class="form-field" style="margin:0">
+          <label style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block">Apellido <span style="color:var(--accent)">*</span></label>
+          <input type="text" id="regOpApellido" placeholder="Tu apellido" autocomplete="off" style="width:100%;box-sizing:border-box"/>
+        </div>
+        <div class="form-field" style="margin:0">
+          <label style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block">WhatsApp <span style="color:var(--accent)">*</span></label>
+          <input type="tel" id="regOpWhatsapp" placeholder="+598 99 123 456" inputmode="tel" autocomplete="off" style="width:100%;box-sizing:border-box"/>
+        </div>
+        <div class="form-field" style="margin:0">
+          <label style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block">Ciudad donde trabajás <span style="color:var(--accent)">*</span></label>
+          <input type="text" id="regOpCiudad" placeholder="Ej: Salto, Montevideo, Paysandú..." autocomplete="off" style="width:100%;box-sizing:border-box"/>
+        </div>
+        <div class="form-field" style="margin:0">
+          <label style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block">Dirección de tu estética o lugar de trabajo <span style="color:var(--accent)">*</span></label>
+          <input type="text" id="regOpLugares" placeholder="Ej: 18 de Julio 1234, Salto" autocomplete="off" style="width:100%;box-sizing:border-box"/>
+        </div>
+        <div class="form-field" style="margin:0">
+          <label style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block">¿Qué máquina querés alquilar? <span style="color:var(--accent)">*</span></label>
+          <select id="regOpMaquinaInteres" style="width:100%;box-sizing:border-box">
+            <option value="">— Elegí una opción —</option>
+            <option value="Láser Depilación">Láser depilación (diodo)</option>
+            <option value="Radiofrecuencia / HIFU">Radiofrecuencia / HIFU</option>
+            <option value="Pressoterapia">Pressoterapia</option>
+            <option value="Electroestimulación">Electroestimulación</option>
+            <option value="No estoy segura">Todavía no estoy segura</option>
+          </select>
+        </div>
+      </div>
+      <!-- Campos ocultos para compatibilidad con submitOperadoraRegistro() -->
+      <input type="hidden" id="regOpDocumento" value="00000"/>
+      <input type="hidden" id="regOpDepartamento" value=""/>
+      <input type="hidden" id="regOpCumpleDia" value="1"/>
+      <select id="regOpCumpleMes" style="display:none"><option value="1" selected>Enero</option></select>
+      <input type="hidden" id="regOpInstagram" value=""/>
+      <input type="hidden" id="regOpEstetica" value=""/>
+      <select id="regOpExperiencia" style="display:none"><option value="Estoy comenzando" selected>Estoy comenzando</option></select>
+      <input type="hidden" id="regOpTratamientosOtros" value=""/>
+      <select id="regOpTrabajoNoEstetico" style="display:none"><option value="no" selected>No</option></select>
+      <textarea id="regOpTrabajoExtra" style="display:none"></textarea>
+      <div id="regOpTrabajoExtraWrap" style="display:none"></div>
+    </div>
+    <div class="modal-foot" style="padding:16px 24px;gap:10px">
+      <button class="btn-secondary" onclick="closeModal('modalRegistroOperadora')" style="flex:1">Cancelar</button>
+      <button class="btn-add" id="regOpSubmitBtn" onclick="submitOperadoraRegistro()" style="flex:2;font-size:15px;padding:12px">
+        ✅ Registrarme
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="app-layout">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-inner">
+          <div class="logo-mark">✦</div>
+          <div class="logo-text"><h2>DepiMóvil</h2><p>Plataforma Operativa</p></div>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section nav-primary">
+          <div class="nav-section-label">Favoritos</div>
+          <div class="nav-quick-grid">
+            <button class="nav-item active" data-view="dashboard" onclick="navigate('dashboard')"><span class="icon">⊞</span><span>Inicio</span></button>
+            <button class="nav-item" data-view="reservas" onclick="navigate('reservas')"><span class="icon">📅</span><span>Reservas</span><span class="nav-badge" id="navBadgeReservas" style="display:none">0</span></button>
+            <button class="nav-item" data-view="operadoras" onclick="navigate('operadoras')"><span class="icon">👩‍💼</span><span>Operadoras</span></button>
+            <button class="nav-item" data-view="maquinas" onclick="navigate('maquinas')"><span class="icon">⚙️</span><span>Máquinas</span><span class="nav-badge" id="navBadgeMaq" style="display:none">0</span></button>
+            <button class="nav-item" data-view="mantenimientos" onclick="navigate('mantenimientos')"><span class="icon">🔧</span><span>Mantenimientos</span><span class="nav-badge" id="navBadgeMant" style="display:none">0</span></button>
+            <button class="nav-item" data-view="caja" onclick="navigate('caja')"><span class="icon">💵</span><span>Caja</span><span class="nav-badge" id="navBadgeCaja" style="display:none">0</span></button>
+            <button class="nav-item" data-view="whatsapp" onclick="navigate('whatsapp')"><span class="icon">💬</span><span>WhatsApp</span><span class="nav-badge" id="navBadgeWA" style="display:none">0</span></button>
+          </div>
+        </div>
+
+        <div class="nav-section-label">Módulos</div>
+        <details class="nav-group" data-nav-group="operaciones">
+          <summary><span>Operaciones</span><span class="chev">⌄</span></summary>
+          <button class="nav-item" data-view="revision-operadoras" onclick="navigate('revision-operadoras')"><span class="icon">☑</span> Revisión <span class="nav-badge" id="navBadgeRevisionOps" style="display:none">0</span></button>
+          <button class="nav-item" data-view="documentos" onclick="navigate('documentos')"><span class="icon">🪪</span> Documentos <span class="nav-badge" id="navBadgeDocumentos" style="display:none">0</span></button>
+          <button class="nav-item" data-view="calendario" onclick="navigate('calendario')"><span class="icon">🗓</span> Calendario</button>
+          <button class="nav-item" data-view="materiales" onclick="navigate('materiales')"><span class="icon">📚</span> Certificaciones</button>
+        </details>
+        <details class="nav-group" data-nav-group="finanzas">
+          <summary><span>Finanzas</span><span class="chev">⌄</span></summary>
+          <button class="nav-item" data-view="pagos" onclick="navigate('pagos')"><span class="icon">💳</span> Pagos y Señas <span class="nav-badge" id="navBadgePagos" style="display:none">0</span></button>
+          <button class="nav-item" data-view="proveedores" onclick="navigate('proveedores')"><span class="icon">🏢</span> Proveedores</button>
+          <button class="nav-item" data-view="compras" onclick="navigate('compras')"><span class="icon">🧾</span> Compras <span class="nav-badge" id="navBadgeCompras" style="display:none">0</span></button>
+          <button class="nav-item" data-view="ventas-maquinas" onclick="navigate('ventas-maquinas')"><span class="icon">🏷</span> Ventas Máquinas <span class="nav-badge" id="navBadgeVentasMaq" style="display:none">0</span></button>
+          <button class="nav-item" data-view="contratos" onclick="navigate('contratos')"><span class="icon">📋</span> Contratos <span class="nav-badge" id="navBadgeContratos" style="display:none">0</span></button>
+        </details>
+        <details class="nav-group" data-nav-group="logistica">
+          <summary><span>Logística</span><span class="chev">⌄</span></summary>
+          <button class="nav-item" data-view="envios" onclick="navigate('envios')"><span class="icon">🚚</span> Envíos <span class="nav-badge" id="navBadgeEnvios" style="display:none">0</span></button>
+          <button class="nav-item" data-view="transportistas" onclick="navigate('transportistas')"><span class="icon">🚛</span> Transportistas</button>
+          <button class="nav-item" data-view="limpiezas" onclick="navigate('limpiezas')"><span class="icon">🧽</span> Limpiezas</button>
+          <button class="nav-item" data-view="logistica" onclick="navigate('logistica')"><span class="icon">🗺</span> Reglas Logísticas</button>
+        </details>
+        <details class="nav-group" data-nav-group="comercial">
+          <summary><span>Comercial</span><span class="chev">⌄</span></summary>
+          <button class="nav-item" data-view="leads" onclick="navigate('leads')"><span class="icon">🎯</span> Leads <span class="nav-badge" id="navBadgeLeads" style="display:none">0</span></button>
+          <button class="nav-item" data-view="embudo" onclick="navigate('embudo')"><span class="icon">🏆</span> Embudo</button>
+        </details>
+        <details class="nav-group" id="adminNav" data-nav-group="sistema">
+          <summary><span>Sistema</span><span class="chev">⌄</span></summary>
+          <button class="nav-item" data-view="reportes" onclick="navigate('reportes')"><span class="icon">📊</span> Reportes</button>
+          <button class="nav-item" data-view="auditoria" onclick="navigate('auditoria')"><span class="icon">🔍</span> Auditoría</button>
+          <button class="nav-item" data-view="configuracion" onclick="navigate('configuracion');setTimeout(()=>document.getElementById('crmColorsSection')?.scrollIntoView({behavior:'smooth',block:'start'}),80)"><span class="icon">🎨</span> Colores</button>
+          <button class="nav-item" data-view="usuarios" onclick="navigate('usuarios')"><span class="icon">👥</span> Usuarios</button>
+        </details>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-marca">
+          <img src="/logo.png?v=20260808" alt="DepiMóvil" onerror="this.style.display='none'">
+          <span>DepiMóvil</span>
+        </div>
+        <div class="user-chip" style="cursor:pointer" onclick="openPerfilModal()" title="Ver perfil / cambiar contraseña">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div class="user-info">
+            <strong id="userName">Usuario</strong>
+            <span id="userRole">Rol</span>
+          </div>
+          <button class="logout-btn" onclick="event.stopPropagation();doLogout()" title="Cerrar sesión">⏏</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+          <span class="page-title" id="pageTitle">Menú</span>
+        </div>
+        <div class="topbar-right">
+          <button class="dashboard-home-btn" id="dashboardHomeBtn" onclick="navigate('dashboard')" style="display:none">← Regresar al menú principal</button>
+          <button class="btn-export" onclick="openSearch()" title="Búsqueda global (/)">
+            🔍 <span style="display:none" id="searchBtnLabel">Buscar</span>
+          </button>
+          <span class="topbar-badge" id="topbarRole">Rol</span>
+        </div>
+      </div>
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div class="view active" id="view-dashboard">
+          <div id="dashAlerts"></div>
+          <div id="kpisFinancieros" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px"></div>
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="dashboard-grid" id="dashboardGrid"></div>
+        </div>
+
+        <!-- OPERADORAS LIST -->
+        <div class="view" id="view-operadoras">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>👩‍💼 Operadoras</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar…" oninput="filterOperadoras(this.value)"/>
+                <select class="filter-select" onchange="filterOpStatus(this.value)">
+                  <option value="">Todos los estados</option>
+                  <option value="activa">Activa</option>
+                  <option value="prospecto">Prospecto</option>
+                  <option value="inactiva">Inactiva</option>
+                  <option value="suspendida">Suspendida</option>
+                </select>
+                <button class="btn-add" onclick="openOpModal()" id="btnAddOp">+ Nueva</button>
+              </div>
+            </div>
+            <div class="op-share-card">
+              <div class="logo-mark"></div>
+              <div class="op-share-copy">
+                <strong>Alta online de operadoras</strong>
+                <span id="registroOperadoraLinkText">https://crm.depimovil.live/alta-operadoras.html</span>
+              </div>
+              <div class="op-share-actions">
+                <button class="btn-secondary" type="button" onclick="previewRegistroOperadoraLink()">Vista preliminar</button>
+                <button class="btn-add" type="button" onclick="copyRegistroOperadoraLink()">Copiar link</button>
+                <a class="action-btn" href="https://crm.depimovil.live/alta-operadoras.html" target="_blank" rel="noopener">Abrir</a>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Nombre</th><th>Gabinete / Actividad</th><th>Ciudad</th><th>Departamento</th>
+                <th>Estado</th><th>Nivel</th><th>Último movimiento</th><th>Acciones</th>
+              </tr></thead><tbody id="opTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- REVISION OPERADORAS -->
+        <div class="view" id="view-revision-operadoras">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>☑ Operadoras pendientes de revisión</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar operadora, ciudad, WhatsApp…" oninput="filterRevisionOperadoras(this.value)"/>
+                <select class="filter-select" onchange="filterRevisionEstado(this.value)">
+                  <option value="">Todas</option>
+                  <option value="pendiente">Pendientes</option>
+                  <option value="documentos_solicitados">Documentos solicitados</option>
+                  <option value="contrato_pendiente">Contrato pendiente</option>
+                  <option value="habilitacion_pendiente">Habilitación pendiente</option>
+                  <option value="direccion_pendiente">Dirección pendiente</option>
+                  <option value="observada">Observadas</option>
+                  <option value="semiaprobada">Semiaprobadas (le faltan datos)</option>
+                  <option value="aprobada">Aprobadas</option>
+                  <option value="rechazada">Rechazadas</option>
+                </select>
+              </div>
+            </div>
+            <div id="revisionOpsResumen" class="docs-summary-grid"></div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Operadora</th><th>Registro</th><th>Experiencia</th><th>Estado revisión</th><th>Acciones</th>
+              </tr></thead><tbody id="revisionOpsTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPERADORA FICHA -->
+        <div class="view" id="view-operadora-ficha">
+          <button class="back-btn" onclick="navigate('operadoras')">← Regresar atrás</button>
+          <div id="fichaOpContent"></div>
+        </div>
+
+        <!-- DOCUMENTOS -->
+        <div class="view" id="view-documentos">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>🪪 Documentos de Operadoras</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar operadora, ciudad, documento…" oninput="filterDocumentos(this.value)"/>
+                <select class="filter-select" onchange="filterDocumentosEstado(this.value)">
+                  <option value="">Todos</option>
+                  <option value="pendiente">Pendientes</option>
+                  <option value="completo">Completos</option>
+                  <option value="contrato_pendiente">Contrato pendiente</option>
+                </select>
+              </div>
+            </div>
+            <div id="documentosResumen" class="docs-summary-grid"></div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Operadora</th><th>Cédula</th><th>Contratos</th><th>Portal</th><th>Acciones</th>
+              </tr></thead><tbody id="documentosTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÁQUINAS LIST -->
+        <div class="view" id="view-maquinas">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>⚙️ Máquinas</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar…" oninput="filterMaquinas(this.value)"/>
+                <select class="filter-select" id="maqFilterCiudad" onchange="filterMaqCiudad(this.value)">
+                  <option value="">Todas las ciudades</option>
+                </select>
+                <select class="filter-select" onchange="filterMaqStatus(this.value)">
+                  <option value="">Todos los estados</option>
+                  <option value="disponible">Disponible</option>
+                  <option value="reservada">Reservada</option>
+                  <option value="mantenimiento">En Mantenimiento</option>
+                  <option value="fuera_servicio">Fuera de Servicio</option>
+                  <option value="en_viaje">En Viaje de China</option>
+                </select>
+                <button class="btn-add" onclick="openMaqModal()" id="btnAddMaq">+ Nueva</button>
+              </div>
+            </div>
+            <div id="maquinasViajerasPanel" class="machine-ops-panel"></div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Código</th><th>Nombre</th><th>Categoría</th><th>Ubicación</th>
+                <th>Estado</th><th>Último Mant.</th><th>Acciones</th>
+              </tr></thead><tbody id="maqTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÁQUINA FICHA -->
+        <div class="view" id="view-maquina-ficha">
+          <button class="back-btn" onclick="navigate('maquinas')">← Volver a Máquinas</button>
+          <div id="fichaMaqContent"></div>
+        </div>
+
+        <!-- MANTENIMIENTOS -->
+        <div class="view" id="view-mantenimientos">
+          <div id="mantAlerts"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>🔧 Mantenimientos</h3>
+              <div class="table-actions">
+                <select class="filter-select" id="mantFilterMaquina" onchange="filterMantMaquina(this.value)">
+                  <option value="">Todas las máquinas</option>
+                </select>
+                <select class="filter-select" onchange="filterMantEstado(this.value)">
+                  <option value="">Todos los estados</option>
+                  <option value="vigente">Vigente</option>
+                  <option value="próximo">Próximo</option>
+                  <option value="vencido">Vencido</option>
+                </select>
+                <button class="btn-add" onclick="openMantModal()" id="btnAddMant">+ Registrar</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Máquina</th><th>Tipo servicio</th><th>Último cambio</th><th>Próximo</th><th>Estado</th>
+              </tr></thead><tbody id="mantTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- USUARIOS -->
+        <div class="view" id="view-usuarios">
+          <div class="table-container">
+            <div class="table-header">
+              <div>
+                <h3>👥 Usuarios internos</h3>
+                <div style="color:var(--text3);font-size:12px;margin-top:2px">Personal con acceso al CRM. Se ingresa con el WhatsApp cargado.</div>
+              </div>
+              <div class="table-actions">
+                <button class="btn-add" onclick="openUsuarioModal()">+ Nuevo usuario</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th style="text-align:right">Acciones</th></tr></thead>
+              <tbody id="usuariosTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIMPIEZAS -->
+        <div class="view" id="view-limpiezas">
+          <div class="table-container">
+            <div class="table-header">
+              <div>
+                <h3>🧽 Limpiezas</h3>
+                <div id="limpResumenLinea" style="color:var(--text3);font-size:12px;margin-top:2px"></div>
+              </div>
+              <div class="table-actions">
+                <select class="filter-select" id="limpFilterMaquina" onchange="filterLimp('maquina',this.value)"><option value="">Todas las máquinas</option></select>
+                <select class="filter-select" id="limpFilterTransportista" onchange="filterLimp('transportista',this.value)"><option value="">Todos los responsables</option></select>
+                <select class="filter-select" onchange="filterLimp('estado',this.value)">
+                  <option value="">Todos los estados</option>
+                  <option value="registrada">Registrada</option>
+                  <option value="liquidada">Liquidada</option>
+                </select>
+                <input type="date" class="filter-select" title="Desde" onchange="filterLimp('desde',this.value)"/>
+                <input type="date" class="filter-select" title="Hasta" onchange="filterLimp('hasta',this.value)"/>
+                <button class="btn-secondary" id="btnLiquidarLimp" onclick="openLiquidarLimpModal()" style="display:none">Liquidar</button>
+                <button class="btn-add" onclick="openLimpiezaModal()" id="btnAddLimp">+ Registrar limpieza</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Fecha</th><th>Máquina</th><th>Tamaño</th><th>Realizada por</th><th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="limpTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESERVAS LIST -->
+        <div class="view" id="view-reservas">
+          <div id="resAlerts"></div>
+          <div id="reservasAutoResumen" class="fin-summary"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>📅 Reservas</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar operadora, máquina, código…" oninput="filterReservas(this.value)"/>
+                <select class="filter-select" onchange="filterResEstado(this.value)" id="filterResStatus">
+                  <option value="">Todos los estados</option>
+                  <option value="solicitud_recibida">Solicitud Recibida</option>
+                  <option value="pendiente_aprobacion">Pendiente Aprobación</option>
+                  <option value="aprobada">Aprobada</option>
+                  <option value="confirmada">Confirmada</option>
+                  <option value="rechazada">Rechazada</option>
+                  <option value="cancelada">Cancelada</option>
+                  <option value="reprogramada">Reprogramada</option>
+                </select>
+                <select class="filter-select" onchange="filterResTipo(this.value)" id="filterResTipo">
+                  <option value="">Todos los tipos</option>
+                  <option value="jornada">Por Jornada</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensual">Mensual</option>
+                </select>
+                <select class="filter-select" onchange="filterResControl(this.value)" id="filterResControl">
+                  <option value="">Todo el control</option>
+                  <option value="bloqueada">Bloqueadas</option>
+                  <option value="revisar">A revisar</option>
+                  <option value="lista">Listas</option>
+                </select>
+                <button class="btn-add" onclick="openResModal()" id="btnAddRes">+ Nueva Reserva</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Código</th><th>Operadora</th><th>Máquina</th><th>Tipo</th>
+                <th>Fecha Jornada / Inicio</th><th>Fin</th><th>Depto.</th><th>Control</th><th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="resTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESERVA FICHA -->
+        <div class="view" id="view-reserva-ficha">
+          <button class="back-btn" onclick="navigate('reservas')">← Volver a Reservas</button>
+          <div id="fichaResContent"></div>
+        </div>
+
+        <!-- CALENDARIO -->
+        <div class="view" id="view-calendario">
+          <div id="calWrap"></div>
+        </div>
+
+        <!-- LOGÍSTICA — PANEL DE REGLAS -->
+        <div class="view" id="view-logistica">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">🗺 Reglas Logísticas por Departamento</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:4px">Configurá los días de bloqueo antes y después de cada jornada por territorio.</p>
+            </div>
+            <button class="btn-add" onclick="resetReglasLogisticas()">↺ Restaurar por defecto</button>
+          </div>
+          <div class="alert-banner info" style="margin-bottom:20px">
+            <span class="ab-icon">ℹ️</span>
+            <div><strong>¿Cómo funciona?</strong> Cuando se crea una reserva, el sistema calcula automáticamente los días bloqueados antes y después de la jornada. Esos días impactan en la disponibilidad real de la máquina.</div>
+          </div>
+          <div class="regla-grid" id="reglaGrid"></div>
+        </div>
+
+        <!-- PAGOS — LISTADO -->
+        <div class="view" id="view-pagos">
+          <div id="pagosAlerts"></div>
+          <div class="fin-summary" id="finSummary"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>💳 Pagos y Señas</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar operadora, reserva…" oninput="filterPagos(this.value)"/>
+                <select class="filter-select" onchange="filterPagoEstado(this.value)" id="filterPagoStatus">
+                  <option value="">Todos los estados</option>
+                  <option value="pendientes">Pendientes y señas</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="sena_pendiente">Seña Pendiente</option>
+                  <option value="sena_abonada">Seña Abonada</option>
+                  <option value="validado">Validado</option>
+                  <option value="rechazado">Rechazado</option>
+                  <option value="deuda_vencida">Deuda Vencida</option>
+                </select>
+                <button class="btn-add" onclick="openPagoModal()" id="btnAddPago">+ Registrar Pago</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Código</th><th>Operadora</th><th>Reserva</th><th>Tipo</th>
+                <th>Total</th><th>Seña</th><th>Saldo</th><th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="pagosTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGO FICHA -->
+        <div class="view" id="view-pago-ficha">
+          <button class="back-btn" onclick="navigate('pagos')">← Volver a Pagos</button>
+          <div id="fichaPagoContent"></div>
+        </div>
+
+        <!-- CONTRATOS -->
+        <div class="view" id="view-contratos">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>📋 Contratos de Alquiler</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar operadora, máquina, CI…" oninput="filterContratos(this.value)"/>
+                <select class="filter-select" onchange="filterContratoEstado(this.value)" id="filterContratoStatus">
+                  <option value="">Todos los estados</option>
+                  <option value="activo">Activos</option>
+                  <option value="finalizado">Finalizados</option>
+                  <option value="anulado">Anulados</option>
+                </select>
+                <button class="btn-add" onclick="openContratoModal()">+ Nuevo Contrato</button>
+              </div>
+            </div>
+            <table>
+              <thead><tr>
+                <th>ID</th><th>Operadora</th><th>Máquina</th><th>Vigencia</th><th>Monto</th><th>Garantía</th><th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="contratosTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- WHATSAPP -->
+        <div class="view" id="view-whatsapp">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">💬 Centro de Notificaciones WhatsApp</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:4px">Gestioná mensajes automáticos a operadoras.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-secondary" onclick="limpiarEnviadas()">🗑 Limpiar enviadas</button>
+              <button class="btn-add" onclick="navigate('reservas')">+ Nueva Reserva</button>
+            </div>
+          </div>
+          <div class="alert-banner info" style="margin-bottom:20px">
+            <span class="ab-icon">🔌</span>
+            <div><strong>WhatsApp API conectada.</strong> Las notificaciones se generan en cola y se envían desde acá con confirmación del administrador.</div>
+          </div>
+          <div class="view-tabs" id="waTabs">
+            <button class="view-tab active" onclick="switchWaTab('pendientes',this)">⏳ Pendientes <span id="waPendCount" style="font-size:10px;opacity:.7"></span></button>
+            <button class="view-tab" onclick="switchWaTab('historial',this)">📋 Historial</button>
+            <button class="view-tab" onclick="switchWaTab('plantillas',this)">✏️ Plantillas</button>
+          </div>
+          <div id="waTabContent"></div>
+        </div>
+
+        <!-- ENVÍOS -->
+        <div class="view" id="view-transportistas"><div id="modulo-transportistas"></div></div>
+        <div class="view" id="view-envios">
+          <div id="enviosAlerts"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>🚚 Envíos de Máquinas</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar operadora, máquina, código…" oninput="filterEnvios(this.value)"/>
+                <select class="filter-select" onchange="filterEnvioEstado(this.value)" id="filterEnvioStatus">
+                  <option value="">Todos los estados</option>
+                  <option value="pendiente_envio">Pendiente Envío</option>
+                  <option value="preparando">Preparando</option>
+                  <option value="en_transito">En Tránsito</option>
+                  <option value="entregado">Entregado</option>
+                  <option value="retiro_pendiente">Retiro Pendiente</option>
+                  <option value="retirado">Retirado</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+                <button class="btn-add" onclick="openEnvioModal()" id="btnAddEnvio">+ Nuevo Envío</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Código</th><th>Operadora</th><th>Máquina</th><th>Reserva</th>
+                <th>Departamento</th><th>F. Envío Est.</th><th>F. Retiro Est.</th>
+                <th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="enviosTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENVÍO FICHA -->
+        <div class="view" id="view-envio-ficha">
+          <button class="back-btn" onclick="navigate('envios')">← Volver a Envíos</button>
+          <div id="fichaEnvioContent"></div>
+        </div>
+
+        <!-- CONFIGURACIÓN -->
+        <div class="view" id="view-configuracion">
+          <div style="margin-bottom:24px">
+            <h2 style="font-size:18px;font-weight:700;color:var(--text)">🎨 Colores del CRM</h2>
+            <p style="font-size:13px;color:var(--text2);margin-top:4px">Datos de la empresa e integración WhatsApp Business API.</p>
+          </div>
+          <div id="configContent"></div>
+        </div>
+
+        <!-- CAJA -->
+        <div class="view" id="view-caja">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">💵 Caja</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:4px">Ingresos, egresos, ajustes y saldos por cuenta y moneda.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-export" onclick="exportarCSV('caja')">⬇ Caja CSV</button>
+              <button class="btn-secondary" onclick="openCierreCajaModal()">Cierre</button>
+              <button class="btn-add" onclick="openCajaModal()">+ Movimiento</button>
+            </div>
+          </div>
+          <div id="cajaAlerts"></div>
+          <div id="cajaResumen" class="fin-summary"></div>
+          <div id="cajaCuentasGrid" class="caja-cuentas-grid"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Cierres de Caja</h3>
+              <div class="table-actions"><button class="action-btn" onclick="openCierreCajaModal()">Nuevo cierre</button></div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Fecha</th><th>Período</th><th>Cuenta</th><th>Moneda</th><th>Sistema</th><th>Contado</th><th>Diferencia</th><th>Mov.</th><th>Obs.</th>
+              </tr></thead><tbody id="cajaCierresTableBody"></tbody></table>
+            </div>
+          </div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Movimientos de Caja</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar concepto, comprobante, persona…" oninput="filterCaja('search',this.value)"/>
+                <select class="filter-select" onchange="filterCaja('tipo',this.value)">
+                  <option value="">Tipo</option>
+                  <option value="ingreso">Ingresos</option>
+                  <option value="egreso">Egresos</option>
+                  <option value="ajuste">Ajustes</option>
+                </select>
+                <select class="filter-select" onchange="filterCaja('estado',this.value)">
+                  <option value="">Estado</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="confirmado">Confirmado</option>
+                  <option value="anulado">Anulado</option>
+                </select>
+                <select class="filter-select" onchange="filterCaja('moneda',this.value)">
+                  <option value="">Moneda</option>
+                  <option value="UYU">UYU</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Fecha</th><th>Código</th><th>Tipo</th><th>Categoría</th><th>Cuenta</th>
+                <th>Monto</th><th>Estado</th><th>Vínculo</th><th>Origen</th><th>Acciones</th>
+              </tr></thead><tbody id="cajaTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROVEEDORES -->
+        <div class="view" id="view-proveedores">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div><h2 style="font-size:18px;font-weight:700;color:var(--text)">🏢 Proveedores</h2><p style="font-size:13px;color:var(--text2);margin-top:4px">Proveedores de repuestos, insumos y servicios.</p></div>
+            <button class="btn-add" onclick="openProveedorModal()">+ Proveedor</button>
+          </div>
+          <div class="table-container">
+            <div class="table-header"><h3>Listado de Proveedores</h3><div class="table-actions"><input class="search-input" placeholder="🔍 Buscar proveedor…" oninput="filterProveedores(this.value)"/></div></div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Nombre</th><th>Documento/RUT</th><th>Teléfono</th><th>Dirección</th><th>Compras</th><th>Acciones</th></tr></thead><tbody id="proveedoresTableBody"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- COMPRAS -->
+        <div class="view" id="view-compras">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div><h2 style="font-size:18px;font-weight:700;color:var(--text)">🧾 Compras</h2><p style="font-size:13px;color:var(--text2);margin-top:4px">Repuestos, insumos, servicio técnico y gastos vinculados a máquinas.</p></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-export" onclick="exportarCSV('compras')">⬇ Compras CSV</button><button class="btn-add" onclick="openCompraModal()">+ Compra</button></div>
+          </div>
+          <div id="comprasAlerts"></div>
+          <div id="comprasResumen" class="fin-summary"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Compras y pagos</h3>
+              <div class="table-actions">
+                <input class="search-input" placeholder="🔍 Buscar compra, proveedor, comprobante…" oninput="filterCompras('search',this.value)"/>
+                <select class="filter-select" onchange="filterCompras('estado',this.value)"><option value="">Estado</option><option value="pendiente">Pendiente</option><option value="parcial">Parcial</option><option value="pagada">Pagada</option><option value="anulada">Anulada</option></select>
+                <select class="filter-select" onchange="filterCompras('categoria',this.value)"><option value="">Categoría</option><option value="repuestos">Repuestos</option><option value="insumos">Insumos</option><option value="servicio_tecnico">Servicio técnico</option><option value="limpieza">Puesta a punto de la máquina</option><option value="transporte">Transporte</option><option value="otros">Otros</option></select>
+              </div>
+            </div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Código</th><th>Proveedor</th><th>Categoría</th><th>Máquina</th><th>Total</th><th>Pagado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="comprasTableBody"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- VENTAS DE MÁQUINAS -->
+        <div class="view" id="view-ventas-maquinas">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div><h2 style="font-size:18px;font-weight:700;color:var(--text)">🏷 Ventas de Máquinas</h2><p style="font-size:13px;color:var(--text2);margin-top:4px">Ventas con adelantos parciales, saldo pendiente e ingresos en Caja.</p></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-export" onclick="exportarCSV('ventas_maquinas')">⬇ Ventas CSV</button><button class="btn-add" onclick="openVentaMaquinaModal()">+ Venta</button></div>
+          </div>
+          <div id="ventasMaqAlerts"></div>
+          <div id="ventasMaqResumen" class="fin-summary"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Ventas y adelantos</h3>
+              <div class="table-actions">
+                <input class="search-input" placeholder="🔍 Buscar máquina, comprador, comprobante…" oninput="filterVentasMaq('search',this.value)"/>
+                <select class="filter-select" onchange="filterVentasMaq('estado',this.value)"><option value="">Estado</option><option value="pendiente">Pendiente</option><option value="parcial">Parcial</option><option value="pagada">Pagada</option><option value="anulada">Anulada</option></select>
+              </div>
+            </div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Código</th><th>Máquina</th><th>Comprador</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="ventasMaqTableBody"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- REPORTES -->
+        <div class="view" id="view-reportes">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">📊 Reportes Operativos</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:4px">Métricas generales del sistema.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap" id="reporteExportBtns">
+              <button class="btn-export" onclick="exportarCSV('reservas')">⬇ Reservas CSV</button>
+              <button class="btn-export" onclick="exportarCSV('operadoras')">⬇ Operadoras CSV</button>
+              <button class="btn-export" onclick="exportarCSV('pagos')">⬇ Pagos CSV</button>
+              <button class="btn-export" onclick="exportarCSV('envios')">⬇ Envíos CSV</button>
+              <button class="btn-export" onclick="exportarCSV('leads')">⬇ Leads CSV</button>
+            </div>
+          </div>
+          <div id="reportesContent"></div>
+        </div>
+
+        <!-- AUDITORÍA -->
+        <div class="view" id="view-auditoria">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">🔍 Log de Auditoría</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:4px">Registro de todas las acciones del sistema.</p>
+            </div>
+            <button class="btn-export" onclick="exportarCSV('audit')">⬇ Exportar CSV</button>
+          </div>
+          <div class="table-container">
+            <div class="table-header" style="padding:12px 16px">
+              <div class="table-actions" style="width:100%">
+                <input class="search-input" type="text" placeholder="🔍 Filtrar por usuario, entidad, acción…" oninput="filterAudit(this.value)" style="flex:1"/>
+                <select class="filter-select" onchange="filterAuditAccion(this.value)">
+                  <option value="">Todas las acciones</option>
+                  <option value="CREATE">CREATE</option>
+                  <option value="UPDATE">UPDATE</option>
+                  <option value="DELETE">DELETE</option>
+                  <option value="LOGIN">LOGIN</option>
+                  <option value="ESTADO">ESTADO</option>
+                </select>
+              </div>
+            </div>
+            <div id="auditBody"></div>
+          </div>
+        </div>
+
+        <!-- CERTIFICACIONES / FORMACIÓN -->
+        <div class="view" id="view-materiales">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">📚 Certificaciones</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:4px">Tests, materiales, videos y manuales por equipo y categoría.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-secondary" type="button" onclick="filterMaterialesTipo('test')">Test</button>
+              <button class="btn-secondary" type="button" onclick="filterMaterialesTipo('')">Materiales</button>
+              <button class="btn-secondary" type="button" onclick="filterMaterialesTipo('video')">Videos</button>
+              <button class="btn-secondary" type="button" onclick="filterMaterialesTipo('manual')">Manuales</button>
+              <select class="filter-select" onchange="filterMateriales(this.value)" id="filterMatCat">
+                <option value="">Todas las categorías</option>
+                <option value="Bioseguridad">📚 Bioseguridad</option>
+                <option value="Skincare">📚 Skincare</option>
+                <option value="Atención al Cliente">📚 Atención al Cliente</option>
+                <option value="Masajes">💆 Masajes</option>
+                <option value="Cavitación">💆 Cavitación</option>
+                <option value="Criolipólisis">💆 Criolipólisis</option>
+                <option value="Emsculpt">💆 Emsculpt</option>
+                <option value="Bronceado">💆 Bronceado</option>
+                <option value="Aparatología">🏅 Aparatología</option>
+                <option value="Láser">🏅 Láser</option>
+                <option value="Nd:YAG">🏅 Nd:YAG</option>
+                <option value="Soprano">🏅 Soprano</option>
+                <option value="Exilis">🏅 Exilis</option>
+                <option value="HydraFacial">🏅 HydraFacial</option>
+                <option value="HIFU">🏅 HIFU</option>
+                <option value="Láser Depilación">⚡ Láser Depilación</option>
+                <option value="Radiofrecuencia / HIFU">💜 Radiofrecuencia / HIFU</option>
+                <option value="Pressoterapia">🌊 Pressoterapia</option>
+                <option value="Electroestimulación">⚡ Electroestimulación</option>
+                <option value="General">📋 General</option>
+              </select>
+              <button class="btn-add" onclick="openMaterialModal()" id="btnAddMaterial">+ Material</button>
+            </div>
+          </div>
+          <div id="materialesContent"></div>
+        </div>
+
+        <!-- LEADS -->
+        <div class="view" id="view-leads">
+          <div id="leadsAlerts"></div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>🎯 Leads / Prospectos</h3>
+              <div class="table-actions">
+                <input class="search-input" type="text" placeholder="🔍 Buscar nombre, negocio, ciudad…" oninput="filterLeads(this.value)"/>
+                <select class="filter-select" onchange="filterLeadEstado(this.value)" id="filterLeadStatus">
+                  <option value="">Todos los estados</option>
+                  <option value="nuevo">Nuevo</option>
+                  <option value="contactado">Contactado</option>
+                  <option value="interesado">Interesado</option>
+                  <option value="calificado">Calificado</option>
+                  <option value="presupuesto_enviado">Presupuesto Enviado</option>
+                  <option value="pendiente_respuesta">Pendiente Respuesta</option>
+                  <option value="pendiente_sena">Pendiente Seña</option>
+                  <option value="reserva_confirmada">Reserva Confirmada</option>
+                  <option value="cliente_activa">Cliente Activa</option>
+                  <option value="cliente_inactiva">Cliente Inactiva</option>
+                  <option value="recuperacion">Recuperación</option>
+                  <option value="seguimiento">Seguimiento</option>
+                  <option value="ganado">Ganado</option>
+                  <option value="perdido">Perdido</option>
+                  <option value="reactivar_luego">Reactivar Luego</option>
+                </select>
+                <select class="filter-select" onchange="filterLeadFuente(this.value)" id="filterLeadFuente">
+                  <option value="">Todas las fuentes</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="referido">Referido</option>
+                  <option value="web">Web / Google</option>
+                  <option value="feria">Feria / Evento</option>
+                  <option value="llamada">Llamada entrante</option>
+                  <option value="otro">Otro</option>
+                </select>
+                <button class="btn-add" onclick="openLeadModal()" id="btnAddLead">+ Nuevo Lead</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table><thead><tr>
+                <th>Nombre</th><th>Negocio</th><th>Ciudad</th><th>WhatsApp</th>
+                <th>Fuente</th><th>Estado</th><th>Próxima Acción</th><th>Alta</th><th>Acciones</th>
+              </tr></thead><tbody id="leadsTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEAD FICHA -->
+        <div class="view" id="view-lead-ficha">
+          <button class="back-btn" onclick="navigate('leads')">← Volver a Leads</button>
+          <div id="fichaLeadContent"></div>
+        </div>
+
+        <!-- EMBUDO COMERCIAL -->
+        <div class="view" id="view-embudo">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--text)">🏆 Embudo Comercial</h2>
+              <p style="font-size:13px;color:var(--text2);margin-top:3px">Visión del pipeline por estado.</p>
+            </div>
+            <button class="btn-add" onclick="openLeadModal()">+ Nuevo Lead</button>
+          </div>
+          <div class="embudo-stats" id="embudoStats"></div>
+          <div class="kanban-board" id="kanbanBoard"></div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav" id="bottomNav">
+      <div class="bottom-nav-inner">
+        <button class="bottom-nav-btn active" data-bnav="dashboard" onclick="navigate('dashboard')">
+          <span class="bnav-icon">⊞</span>Inicio
+        </button>
+        <button class="bottom-nav-btn" data-bnav="maquinas" onclick="navigate('maquinas')">
+          <span class="bnav-icon">⚙️</span>Máquinas
+        </button>
+        <button class="bottom-nav-btn" data-bnav="reservas" onclick="navigate('reservas')">
+          <span class="bnav-icon">📅</span>Reservas
+        </button>
+        <button class="bottom-nav-btn" data-bnav="operadoras" onclick="navigate('operadoras')">
+          <span class="bnav-icon">👩‍💼</span>Operas.
+        </button>
+        <button class="bottom-nav-btn" data-bnav="mas" onclick="toggleSidebar()">
+          <span class="bnav-icon">☰</span>Más
+        </button>
+      </div>
+    </nav>
+
+  </div>
+</div>
+
+<div id="dmModalsMount"></div>
+<script data-cfasync="false">
+(function loadDepimovilPartials(){
+  var mount = document.getElementById('dmModalsMount');
+  if (!mount) return;
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'partials/modals.html?v=20260923-semi', false);
+  xhr.send(null);
+  if (xhr.status >= 200 && xhr.status < 300) {
+    mount.outerHTML = xhr.responseText;
+  } else {
+    mount.outerHTML = '<div id="toast"><span class="toast-icon" id="toastIcon">!</span><span id="toastMsg">No se pudieron cargar los modales del CRM.</span></div>';
+    console.error('No se pudo cargar partials/modals.html', xhr.status);
+  }
+})();
+</script>
+
+<script data-cfasync="false" src="assets/js/core/storage-api.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/core/seed-data.js?v=20260526-no-demo-prod"></script>
+<script data-cfasync="false" src="assets/js/core/auth.js?v=20260719-solo-mail"></script>
+<script data-cfasync="false" src="assets/js/core/navigation.js?v=20260919-coordinadora"></script>
+<script data-cfasync="false" src="assets/js/modules/dashboard.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/operadoras.js?v=20260923-datos"></script>
+<script data-cfasync="false" src="assets/js/modules/revision-operadoras.js?v=20260923-semi"></script>
+<script data-cfasync="false" src="assets/js/modules/documentos.js?v=20260531-certificados"></script>
+<script data-cfasync="false" src="assets/js/modules/maquinas.js?v=20261010-fix-v2"></script>
+<script data-cfasync="false" src="assets/js/modules/mantenimientos.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/limpiezas.js?v=20260921-traslados"></script>
+<script data-cfasync="false" src="assets/js/modules/usuarios.js?v=20261008-usuarios2"></script>
+<script data-cfasync="false" src="assets/js/modules/reservas.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/logistica.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/pagos.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/caja.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/compras-proveedores.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/ventas-maquinas.js?v=20260921-15d"></script>
+<script data-cfasync="false" src="assets/js/modules/reserva-automatizacion.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/whatsapp.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/envios.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/configuracion.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/reportes.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/auditoria.js?v=20260523-xss"></script>
+<script data-cfasync="false" src="assets/js/modules/busqueda.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/exportacion.js"></script>
+<script data-cfasync="false" src="assets/js/modules/leads.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/perfil.js?v=20260523-security"></script>
+<script data-cfasync="false" src="assets/js/modules/embudo.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/notas-leads.js"></script>
+<script data-cfasync="false" src="assets/js/modules/formacion-data.js?v=20260611-split"></script>
+<script data-cfasync="false" src="assets/js/modules/formacion-helpers.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/formacion-evaluaciones.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/formacion-capacitaciones.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/formacion-render.js?v=20260611-split"></script>
+<script data-cfasync="false" src="assets/js/core/helpers.js?v=20260919-coordinadora"></script>
+<script data-cfasync="false" src="assets/js/core/boot.js?v=20260602-contrato-unico"></script>
+<script data-cfasync="false" src="assets/js/modules/transportistas.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/contratos-y-filtros.js?v=20260527-contrato-marco"></script>
+<script data-cfasync="false" src="assets/js/modules/contratos.js?v=20260921-qa"></script>
+<script src="/assets/js/mobile-qr.js?v=20260703"></script>
+<script src="/assets/js/mobile-admin-entry.js?v=20260807"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});});
+}
+</script>
+</body>
+</html>
