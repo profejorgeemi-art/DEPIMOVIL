@@ -23,8 +23,8 @@ function maqTipoOperativoBadge(m){
   return '';
 }
 function badgeMaq(e){
-  const m={disponible:'badge-green',reservada:'badge-rose',mantenimiento:'badge-yellow',fuera_servicio:'badge-red',en_viaje:'badge-blue'};
-  const l={disponible:'Disponible',reservada:'Reservada',mantenimiento:'Mantenimiento',fuera_servicio:'Fuera Servicio',en_viaje:'En Viaje de China'};
+  const m={disponible:'badge-green',reservada:'badge-rose',mantenimiento:'badge-yellow',fuera_servicio:'badge-red',en_viaje:'badge-blue',alquilada_mensual:'badge-purple'};
+  const l={disponible:'Disponible',reservada:'Reservada',mantenimiento:'Mantenimiento',fuera_servicio:'Fuera Servicio',en_viaje:'En Viaje de China',alquilada_mensual:'Alquilada Mensual'};
   return `<span class="badge ${m[e]||'badge-gray'}">${l[e]||e}</span>`;
 }
 function badgeSubEstadoMaq(m){
@@ -469,7 +469,7 @@ function showMaqFicha(id){
         ${badgeMaq(m.estado)}
         ${badgeSubEstadoMaq(m)}
         ${canEdit()?`<button class="btn-secondary" onclick="openMaqModal(${m.id})">✏️ Editar</button>`:''}
-        ${isSuperAdmin()?`<button class="btn-danger" onclick="deleteMaquina(${m.id})">🗑</button>`:''}
+        ${canEdit()?`<button class="btn-danger" onclick="deleteMaquina(${m.id})">🗑 Eliminar</button>`:''}
       </div>
     </div>
     <div class="ficha-grid">
