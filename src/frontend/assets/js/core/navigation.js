@@ -35,7 +35,9 @@ const navGroupByView={
   leads:'comercial',embudo:'comercial',
   reportes:'sistema',auditoria:'sistema',configuracion:'sistema',usuarios:'sistema'
 };
+const PAUSED_VIEWS={leads:1,embudo:1,'lead-ficha':1};
 function navigate(view){
+  if(PAUSED_VIEWS[view])return navigate('dashboard');
   if(typeof canView==='function'&&!canView(view)){
     const fallback=(typeof getAccessRole==='function'&&getAccessRole()==='transportista')?'envios':'dashboard';
     showToast('⚠️ Tu usuario no tiene acceso a ese módulo','warn');
