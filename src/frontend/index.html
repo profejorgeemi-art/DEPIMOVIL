@@ -32,7 +32,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="DepiMóvil"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<link rel="stylesheet" href="assets/css/app.css?v=20261011-maqtabs"/>
+<link rel="stylesheet" href="assets/css/app.css?v=20261011-leasing"/>
 </head>
 <body>
 
@@ -185,6 +185,7 @@
           <button class="nav-item" data-view="compras" onclick="navigate('compras')"><span class="icon">🧾</span> Compras <span class="nav-badge" id="navBadgeCompras" style="display:none">0</span></button>
           <button class="nav-item" data-view="ventas-maquinas" onclick="navigate('ventas-maquinas')"><span class="icon">🏷</span> Ventas Máquinas <span class="nav-badge" id="navBadgeVentasMaq" style="display:none">0</span></button>
           <button class="nav-item" data-view="contratos" onclick="navigate('contratos')"><span class="icon">📋</span> Contratos <span class="nav-badge" id="navBadgeContratos" style="display:none">0</span></button>
+          <button class="nav-item" data-view="leasing" onclick="navigate('leasing')"><span class="icon">📑</span> Leasing <span class="nav-badge" id="navBadgeLeasing" style="display:none">0</span></button>
         </details>
         <details class="nav-group" data-nav-group="logistica">
           <summary><span>Logística</span><span class="chev">⌄</span></summary>
@@ -566,6 +567,19 @@
         </div>
 
         <!-- CONTRATOS -->
+        <!-- LEASING -->
+        <div class="view" id="view-leasing">
+          <div class="table-container">
+            <div id="leasingContent"><div class="loading">Cargando...</div></div>
+          </div>
+        </div>
+
+        <!-- LEASING FICHA -->
+        <div class="view" id="view-leasing-ficha">
+          <button class="back-btn" onclick="navigate('leasing')">← Volver a Leasing</button>
+          <div id="fichaLeasingContent"></div>
+        </div>
+
         <div class="view" id="view-contratos">
           <div class="table-container">
             <div class="table-header">
@@ -1011,6 +1025,7 @@
 <script data-cfasync="false" src="assets/js/modules/transportistas.js?v=20260921-qa"></script>
 <script data-cfasync="false" src="assets/js/modules/contratos-y-filtros.js?v=20260527-contrato-marco"></script>
 <script data-cfasync="false" src="assets/js/modules/contratos.js?v=20260921-qa"></script>
+<script data-cfasync="false" src="assets/js/modules/leasing.js?v=20261011-v1"></script>
 <script src="/assets/js/mobile-qr.js?v=20260703"></script>
 <script src="/assets/js/mobile-admin-entry.js?v=20260807"></script>
 <script>

@@ -1620,6 +1620,62 @@ select,input,textarea,button{font-size:14px !important}
 }
 
 /* ══════════════════════════════════
+   LEASING
+══════════════════════════════════ */
+.leasing-dashboard{margin-bottom:16px}
+.leasing-kpi-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;
+}
+.leasing-kpi{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;
+}
+.leasing-kpi-icon{font-size:22px}
+.leasing-kpi small{display:block;color:var(--text3);font-size:11px}
+.leasing-kpi strong{font-size:18px;color:var(--text)}
+.leasing-kpi.accent strong{color:var(--accent)}
+.leasing-kpi.ok strong{color:var(--success,#22c55e)}
+.leasing-kpi.warn strong{color:var(--warning,#eab308)}
+.leasing-kpi.danger strong{color:var(--danger,#ef4444)}
+.leasing-kpi.muted strong{color:var(--text3)}
+.leasing-progress{
+  position:relative;height:24px;background:var(--surface2,rgba(255,255,255,0.08));
+  border-radius:12px;overflow:hidden;
+}
+.leasing-progress-bar{
+  height:100%;background:var(--accent);border-radius:12px;transition:width .3s;
+}
+.leasing-progress span{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:var(--text);
+}
+.leasing-proxvenc{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;
+}
+.leasing-proxvenc h4{margin:0 0 10px;font-size:13px;color:var(--text3)}
+.leasing-venc-row{
+  display:flex;justify-content:space-between;padding:6px 0;
+  border-bottom:1px solid var(--border);font-size:13px;
+}
+.leasing-venc-row:last-child{border:none}
+.leasing-ficha-header{
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;
+  padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px;
+}
+.leasing-ficha-header h2{margin:0 0 4px}
+.leasing-ficha-header p{margin:0;color:var(--text3);font-size:14px}
+.leasing-ficha-meta{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;
+}
+.leasing-ficha-meta div small{display:block;color:var(--text3);font-size:11px}
+.leasing-ficha-meta div strong{font-size:14px}
+.leasing-obs{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;font-size:13px;margin:10px 0;
+}
+
+/* ══════════════════════════════════
    BOTTOM NAV BAR - Mobile Navigation
 ══════════════════════════════════ */
 .bottom-nav{

@@ -6,6 +6,7 @@ import { OperatorsModule } from './operators/operators.module';
 import { MachinesModule } from './machines/machines.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { PaymentsModule } from './payments/payments.module';
+import { LeasingModule } from './leasing/leasing.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PaymentsModule } from './payments/payments.module';
     MachinesModule,
     ReservationsModule,
     PaymentsModule,
+    LeasingModule,
   ],
   controllers: [],
   providers: [],
