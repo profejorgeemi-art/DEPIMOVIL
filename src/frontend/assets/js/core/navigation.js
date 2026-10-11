@@ -24,20 +24,15 @@ const viewTitles={'transportistas':'Transportistas',
   configuracion:'Colores',
   reportes:'Reportes Operativos',
   auditoria:'Log de Auditoría',
-  leads:'Leads / Prospectos CRM','lead-ficha':'Ficha de Lead',
-  embudo:'Embudo Comercial',
   materiales:'Certificaciones',
 };
 const navGroupByView={
   'revision-operadoras':'operaciones',documentos:'operaciones',mantenimientos:'operaciones',calendario:'operaciones',materiales:'operaciones',
   pagos:'finanzas',proveedores:'finanzas',compras:'finanzas','ventas-maquinas':'finanzas',contratos:'finanzas',leasing:'finanzas',
   envios:'logistica',transportistas:'logistica',limpiezas:'logistica',logistica:'logistica',
-  leads:'comercial',embudo:'comercial',
   reportes:'sistema',auditoria:'sistema',configuracion:'sistema',usuarios:'sistema'
 };
-const PAUSED_VIEWS={leads:1,embudo:1,'lead-ficha':1};
 function navigate(view){
-  if(PAUSED_VIEWS[view])return navigate('dashboard');
   if(typeof canView==='function'&&!canView(view)){
     const fallback=(typeof getAccessRole==='function'&&getAccessRole()==='transportista')?'envios':'dashboard';
     showToast('⚠️ Tu usuario no tiene acceso a ese módulo','warn');
@@ -92,8 +87,6 @@ function navigate(view){
   if(view==='configuracion')renderConfiguracion();
   if(view==='reportes')renderReportes();
   if(view==='auditoria')renderAuditoria();
-  if(view==='leads')renderLeads();
-  if(view==='embudo')renderEmbudo();
   if(view==='materiales')renderMateriales();
 }
 function toggleSidebar(){

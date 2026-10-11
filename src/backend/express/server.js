@@ -84,7 +84,6 @@ app.use('/api/limpiezas', require('./routes/limpiezas'));
 app.use('/api/reservas', require('./routes/reservas'));
 app.use('/api/pagos', require('./routes/pagos'));
 app.use('/api/finanzas', require('./routes/finanzas'));
-app.use('/api/leads', require('./routes/leads'));
 app.use('/api/envios', require('./routes/envios'));
 app.use('/api/transportistas', require('./routes/transportistas'));
 app.use('/api/webhook/whatsapp', require('./routes/whatsapp'));

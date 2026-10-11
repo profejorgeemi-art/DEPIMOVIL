@@ -1,0 +1,67 @@
+<!-- LEADS -->
+<div class="view" id="view-leads">
+  <div id="leadsAlerts"></div>
+  <div class="table-container">
+    <div class="table-header">
+      <h3>🎯 Leads / Prospectos</h3>
+      <div class="table-actions">
+        <input class="search-input" type="text" placeholder="🔍 Buscar nombre, negocio, ciudad…" oninput="filterLeads(this.value)"/>
+        <select class="filter-select" onchange="filterLeadEstado(this.value)" id="filterLeadStatus">
+          <option value="">Todos los estados</option>
+          <option value="nuevo">Nuevo</option>
+          <option value="contactado">Contactado</option>
+          <option value="interesado">Interesado</option>
+          <option value="calificado">Calificado</option>
+          <option value="presupuesto_enviado">Presupuesto Enviado</option>
+          <option value="pendiente_respuesta">Pendiente Respuesta</option>
+          <option value="pendiente_sena">Pendiente Seña</option>
+          <option value="reserva_confirmada">Reserva Confirmada</option>
+          <option value="cliente_activa">Cliente Activa</option>
+          <option value="cliente_inactiva">Cliente Inactiva</option>
+          <option value="recuperacion">Recuperación</option>
+          <option value="seguimiento">Seguimiento</option>
+          <option value="ganado">Ganado</option>
+          <option value="perdido">Perdido</option>
+          <option value="reactivar_luego">Reactivar Luego</option>
+        </select>
+        <select class="filter-select" onchange="filterLeadFuente(this.value)" id="filterLeadFuente">
+          <option value="">Todas las fuentes</option>
+          <option value="instagram">Instagram</option>
+          <option value="facebook">Facebook</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="referido">Referido</option>
+          <option value="web">Web / Google</option>
+          <option value="feria">Feria / Evento</option>
+          <option value="llamada">Llamada entrante</option>
+          <option value="otro">Otro</option>
+        </select>
+        <button class="btn-add" onclick="openLeadModal()" id="btnAddLead">+ Nuevo Lead</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table><thead><tr>
+        <th>Nombre</th><th>Negocio</th><th>Ciudad</th><th>WhatsApp</th>
+        <th>Fuente</th><th>Estado</th><th>Próxima Acción</th><th>Alta</th><th>Acciones</th>
+      </tr></thead><tbody id="leadsTableBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- LEAD FICHA -->
+<div class="view" id="view-lead-ficha">
+  <button class="back-btn" onclick="navigate('leads')">← Volver a Leads</button>
+  <div id="fichaLeadContent"></div>
+</div>
+
+<!-- EMBUDO COMERCIAL -->
+<div class="view" id="view-embudo">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div>
+      <h2 style="font-size:18px;font-weight:700;color:var(--text)">🏆 Embudo Comercial</h2>
+      <p style="font-size:13px;color:var(--text2);margin-top:3px">Visión del pipeline por estado.</p>
+    </div>
+    <button class="btn-add" onclick="openLeadModal()">+ Nuevo Lead</button>
+  </div>
+  <div class="embudo-stats" id="embudoStats"></div>
+  <div class="kanban-board" id="kanbanBoard"></div>
+</div>
