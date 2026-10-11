@@ -1,7 +1,7 @@
 /* ══════════════════════════════════
    MÁQUINAS
 ══════════════════════════════════ */
-let maqFilter={search:'',status:'',ciudad:''};
+let maqFilter={search:'',status:'',ciudad:'',tab:'operativas'};
 let maqPrecioEditId=null;
 const MAQ_CATEGORIAS_DEFAULT=['Láser Depilación','Radiofrecuencia / HIFU','IPL','Pressoterapia','Hidrofacial','Electroestimulación','Ultrasonido','Cavitación','Diodo + NDYAG','Otro'];
 function maqTipoOperativoLabel(tipo){
@@ -319,19 +319,43 @@ function syncMaqFilterCiudad(visibles){
     ciudades.map(c=>`<option value="${escapeAttr(c)}">${escapeHTML(c)}</option>`).join('');
   if(ciudades.includes(prev))select.value=prev;else{select.value='';maqFilter.ciudad='';}
 }
+function filterMaqTab(tab){
+  maqFilter.tab=tab;
+  document.querySelectorAll('.maq-tab-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector('[data-maq-tab="'+tab+'"]');
+  if(btn)btn.classList.add('active');
+  renderMaquinas();
+}
 function renderMaquinas(){
   const opActual=isOperadoraUser()?getOp(currentUser?.operadora_id):null;
   const visibles=(DB.get('maquinas')||[]).filter(m=>maquinaVisibleParaOperadora(m,opActual));
-  renderMaquinasViajerasPanel(visibles);
-  syncMaqFilterCiudad(visibles);
-  const maqs=visibles.filter(m=>{
+  const isVenta=maqFilter.tab==='venta';
+  const tabFiltered=visibles.filter(m=>{
+    const tipo=m.tipoOperativo||'base_ciudad';
+    return isVenta?(tipo==='solo_venta'):(tipo!=='solo_venta');
+  });
+  const countOp=visibles.filter(m=>(m.tipoOperativo||'base_ciudad')!=='solo_venta').length;
+  const countVenta=visibles.filter(m=>m.tipoOperativo==='solo_venta').length;
+  const tabBar=document.getElementById('maqTabBar');
+  if(tabBar){
+    tabBar.innerHTML=`<button class="maq-tab-btn ${!isVenta?'active':''}" data-maq-tab="operativas" onclick="filterMaqTab('operativas')">⚙️ Operativas <span class="maq-tab-count">${countOp}</span></button>`+
+      `<button class="maq-tab-btn ${isVenta?'active':''}" data-maq-tab="venta" onclick="filterMaqTab('venta')">🏷️ Stock Venta <span class="maq-tab-count">${countVenta}</span></button>`;
+  }
+  const viajerasPanel=document.getElementById('maquinasViajerasPanel');
+  if(isVenta){
+    if(viajerasPanel)viajerasPanel.innerHTML='';
+  }else{
+    renderMaquinasViajerasPanel(tabFiltered);
+  }
+  syncMaqFilterCiudad(tabFiltered);
+  const maqs=tabFiltered.filter(m=>{
     const q=maqFilter.search.toLowerCase();
     const ms=!q||(m.codigo+' '+m.nombre+' '+m.categoria+' '+m.ubicacion).toLowerCase().includes(q);
     const cs=!maqFilter.ciudad||maqCiudadEfectiva(m)===maqFilter.ciudad;
     return ms&&cs&&(!maqFilter.status||m.estado===maqFilter.status);
   });
   const tbody=document.getElementById('maqTableBody');
-  if(!maqs.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="icon">⚙️</div><h3>Sin resultados</h3></div></td></tr>`;return;}
+  if(!maqs.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="icon">${isVenta?'🏷️':'⚙️'}</div><h3>Sin ${isVenta?'máquinas en stock para venta':'resultados'}</h3></div></td></tr>`;return;}
   tbody.innerHTML=maqs.map(m=>`<tr>
     <td><span style="font-family:monospace;color:var(--accent);font-size:12px">${escapeHTML(m.codigo)}</span></td>
     <td><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">${maquinaPhotoUrl(m)?`<img class="machine-mini-thumb" src="${escapeAttr(maquinaPhotoUrl(m))}" alt="${escapeAttr(m.nombre)}"/>`:'<span class="machine-mini-thumb" style="display:inline-flex;align-items:center;justify-content:center;color:var(--text3);font-size:15px">⚙️</span>'}<span class="bold">${escapeHTML(m.nombre)}</span>${maqTipoOperativoBadge(m)}</div></td><td>${escapeHTML(m.categoria)}</td>
